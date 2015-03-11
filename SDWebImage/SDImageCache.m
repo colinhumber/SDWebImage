@@ -474,7 +474,12 @@ BOOL ImageDataHasPNGPreffix(NSData *data) {
 }
 
 - (void)backgroundCleanDisk {
-    UIApplication *application = [UIApplication sharedApplication];
+    UIApplication *application = [UIApplication performSelector:NSSelectorFromString(NSStringFromSelector(@selector(sharedApplication)))];
+
+    if (!application) {
+        return;
+    }
+    
     __block UIBackgroundTaskIdentifier bgTask = [application beginBackgroundTaskWithExpirationHandler:^{
         // Clean up any unfinished task business by marking where you
         // stopped or ending the task outright.

@@ -71,14 +71,16 @@
 
 #if TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_4_0
         if ([self shouldContinueWhenAppEntersBackground]) {
+            UIApplication *application = [UIApplication performSelector:NSSelectorFromString(NSStringFromSelector(@selector(sharedApplication)))];
+
             __weak __typeof__ (self) wself = self;
-            self.backgroundTaskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+            self.backgroundTaskId = [application beginBackgroundTaskWithExpirationHandler:^{
                 __strong __typeof (wself) sself = wself;
 
                 if (sself) {
                     [sself cancel];
 
-                    [[UIApplication sharedApplication] endBackgroundTask:sself.backgroundTaskId];
+                    [application endBackgroundTask:sself.backgroundTaskId];
                     sself.backgroundTaskId = UIBackgroundTaskInvalid;
                 }
             }];
@@ -123,8 +125,12 @@
 
 #if TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_4_0
     if (self.backgroundTaskId != UIBackgroundTaskInvalid) {
-        [[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskId];
-        self.backgroundTaskId = UIBackgroundTaskInvalid;
+        UIApplication *application = [UIApplication performSelector:NSSelectorFromString(NSStringFromSelector(@selector(sharedApplication)))];
+
+        if (application) {
+            [application endBackgroundTask:self.backgroundTaskId];
+            self.backgroundTaskId = UIBackgroundTaskInvalid;
+        }
     }
 #endif
 }
